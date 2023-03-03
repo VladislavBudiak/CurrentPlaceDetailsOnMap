@@ -78,10 +78,8 @@ public class MapsActivityCurrentPlace extends AppCompatActivity
     private Location lastKnownLocation;
 
     // Keys for storing activity state.
-    // [START maps_current_place_state_keys]
     private static final String KEY_CAMERA_POSITION = "camera_position";
     private static final String KEY_LOCATION = "location";
-    // [END maps_current_place_state_keys]
 
     // Used for selecting the current place.
     private static final int M_MAX_ENTRIES = 5;
@@ -93,7 +91,6 @@ public class MapsActivityCurrentPlace extends AppCompatActivity
     private View cardBanner;
     private List<CardLite> cards = new ArrayList<>();
 
-    // [START maps_current_place_on_create]
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -104,20 +101,15 @@ public class MapsActivityCurrentPlace extends AppCompatActivity
         cards.add(new CardLite(new LatLng(51.452699, 5.500404), "Test Lake",
                 "This is an example description for Shadow", R.drawable.shadow));
 
-        // [START_EXCLUDE silent]
-        // [START maps_current_place_on_create_save_instance_state]
         // Retrieve location and camera position from saved instance state.
         if (savedInstanceState != null) {
             lastKnownLocation = savedInstanceState.getParcelable(KEY_LOCATION);
             cameraPosition = savedInstanceState.getParcelable(KEY_CAMERA_POSITION);
         }
-        // [END maps_current_place_on_create_save_instance_state]
-        // [END_EXCLUDE]
 
         // Retrieve the content view that renders the map.
         setContentView(R.layout.activity_maps);
 
-        // [START_EXCLUDE silent]
         // Construct a PlacesClient
         Places.initialize(getApplicationContext(), BuildConfig.MAPS_API_KEY);
         placesClient = Places.createClient(this);
@@ -126,20 +118,15 @@ public class MapsActivityCurrentPlace extends AppCompatActivity
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
 
         // Build the map.
-        // [START maps_current_place_map_fragment]
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
-        // [END maps_current_place_map_fragment]
-        // [END_EXCLUDE]
 
     }
-    // [END maps_current_place_on_create]
 
     /**
      * Saves the state of the map when the activity is paused.
      */
-    // [START maps_current_place_on_save_instance_state]
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         if (map != null) {
@@ -148,7 +135,6 @@ public class MapsActivityCurrentPlace extends AppCompatActivity
         }
         super.onSaveInstanceState(outState);
     }
-    // [END maps_current_place_on_save_instance_state]
 
     /**
      * Sets up the options menu.
@@ -166,7 +152,6 @@ public class MapsActivityCurrentPlace extends AppCompatActivity
      * @param item The menu item to handle.
      * @return Boolean.
      */
-    // [START maps_current_place_on_options_item_selected]
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == R.id.option_get_place) {
@@ -174,7 +159,6 @@ public class MapsActivityCurrentPlace extends AppCompatActivity
         }
         return true;
     }
-    // [END maps_current_place_on_options_item_selected]
 
     void nearestDistance() {
         LatLng currentLocation = new LatLng(lastKnownLocation.getLatitude(),
@@ -205,13 +189,9 @@ public class MapsActivityCurrentPlace extends AppCompatActivity
      * Manipulates the map when it's available.
      * This callback is triggered when the map is ready to be used.
      */
-    // [START maps_current_place_on_map_ready]
     @Override
     public void onMapReady(GoogleMap map) {
         this.map = map;
-
-        // [START_EXCLUDE]
-        // [START map_current_place_set_info_window_adapter]
         // Use a custom info window adapter to handle multiple lines of text in the
         // info window contents.
         this.map.setInfoWindowAdapter(new GoogleMap.InfoWindowAdapter() {
@@ -266,7 +246,6 @@ public class MapsActivityCurrentPlace extends AppCompatActivity
         float distanceInMeters = lastKnownLocation.distanceTo(geoMarkerLocation);
         Log.i("TAG", Float.toString(distanceInMeters));*/
     }
-    // [END maps_current_place_on_map_ready]
 
     public void addPointsOnTheMap() {
         //geoMarkersLocations.add(new LatLng(51.452699, 5.500404));
@@ -281,7 +260,6 @@ public class MapsActivityCurrentPlace extends AppCompatActivity
     /**
      * Gets the current location of the device, and positions the map's camera.
      */
-    // [START maps_current_place_get_device_location]
     /** Called when the user clicks a marker. */
     @Override
     public boolean onMarkerClick(final Marker marker) {
@@ -352,12 +330,10 @@ public class MapsActivityCurrentPlace extends AppCompatActivity
             Log.e("Exception: %s", e.getMessage(), e);
         }
     }
-    // [END maps_current_place_get_device_location]
 
     /**
      * Prompts the user for permission to use the device location.
      */
-    // [START maps_current_place_location_permission]
     private void getLocationPermission() {
         /*
          * Request location permission, so that we can get the location of the
@@ -374,12 +350,10 @@ public class MapsActivityCurrentPlace extends AppCompatActivity
                     PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION);
         }
     }
-    // [END maps_current_place_location_permission]
 
     /**
      * Handles the result of the request for location permissions.
      */
-    // [START maps_current_place_on_request_permissions_result]
     @Override
     public void onRequestPermissionsResult(int requestCode,
                                            @NonNull String[] permissions,
@@ -396,13 +370,11 @@ public class MapsActivityCurrentPlace extends AppCompatActivity
         }
         updateLocationUI();
     }
-    // [END maps_current_place_on_request_permissions_result]
 
     /**
      * Prompts the user to select the current place from a list of likely places, and shows the
      * current place on the map - provided the user has granted location permission.
      */
-    // [START maps_current_place_show_current_place]
     private void showCurrentPlace() {
         if (map == null) {
             return;
@@ -479,12 +451,10 @@ public class MapsActivityCurrentPlace extends AppCompatActivity
             getLocationPermission();
         }
     }
-    // [END maps_current_place_show_current_place]
 
     /**
      * Displays a form allowing the user to select a place from a list of likely places.
      */
-    // [START maps_current_place_open_places_dialog]
     private void openPlacesDialog() {
         // Ask the user to choose the place where they are now.
         DialogInterface.OnClickListener listener = new DialogInterface.OnClickListener() {
@@ -516,12 +486,10 @@ public class MapsActivityCurrentPlace extends AppCompatActivity
                 .setItems(likelyPlaceNames, listener)
                 .show();
     }
-    // [END maps_current_place_open_places_dialog]
 
     /**
      * Updates the map's UI settings based on whether the user has granted location permission.
      */
-    // [START maps_current_place_update_location_ui]
     private void updateLocationUI() {
         if (map == null) {
             return;
@@ -540,7 +508,6 @@ public class MapsActivityCurrentPlace extends AppCompatActivity
             Log.e("Exception: %s", e.getMessage());
         }
     }
-    // [END maps_current_place_update_location_ui]
 
     public void onCompassClicked(View view) {
         float currentBearing = map.getCameraPosition().bearing;
