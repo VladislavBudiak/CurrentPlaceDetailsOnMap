@@ -3,8 +3,9 @@ package com.example.currentplacedetailsonmap;
 import com.google.android.gms.maps.model.MarkerOptions; // for adding pinpoints on the map
 
 import android.content.Context;
+import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.Toast;
-import com.google.android.material.snackbar.Snackbar;
 import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.location.Location;
@@ -32,7 +33,6 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
-import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 
@@ -90,10 +90,19 @@ public class MapsActivityCurrentPlace extends AppCompatActivity
     private List[] likelyPlaceAttributions;
     private LatLng[] likelyPlaceLatLngs;
 
+    private View cardBanner;
+    private List<CardLite> cards = new ArrayList<>();
+
     // [START maps_current_place_on_create]
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        cards.add(new CardLite(new LatLng(51.449331, 5.487503), "Test School",
+                "This is an example description for Sonic", R.drawable.sonic));
+
+        cards.add(new CardLite(new LatLng(51.452699, 5.500404), "Test Lake",
+                "This is an example description for Shadow", R.drawable.shadow));
 
         // [START_EXCLUDE silent]
         // [START maps_current_place_on_create_save_instance_state]
@@ -123,6 +132,7 @@ public class MapsActivityCurrentPlace extends AppCompatActivity
         mapFragment.getMapAsync(this);
         // [END maps_current_place_map_fragment]
         // [END_EXCLUDE]
+
     }
     // [END maps_current_place_on_create]
 
@@ -224,7 +234,16 @@ public class MapsActivityCurrentPlace extends AppCompatActivity
                 TextView snippet = infoWindow.findViewById(R.id.snippet);
                 snippet.setText(marker.getSnippet());
 
-                return infoWindow;
+                // NO CUSTOM INFO
+
+                return null;
+            }
+        });
+        this.map.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
+
+            @Override
+            public void onMapClick(@NonNull LatLng latLng) {
+                hideCardBannerIfActive();
             }
         });
         // [END map_current_place_set_info_window_adapter]
@@ -250,11 +269,11 @@ public class MapsActivityCurrentPlace extends AppCompatActivity
     // [END maps_current_place_on_map_ready]
 
     public void addPointsOnTheMap() {
-        geoMarkersLocations.add(new LatLng(51.452699, 5.500404));
-        geoMarkersLocations.add(new LatLng(51.449331, 5.487503));
-        for (int i = 0; i < geoMarkersLocations.size(); i++) {
+        //geoMarkersLocations.add(new LatLng(51.452699, 5.500404));
+        //geoMarkersLocations.add(new LatLng(51.449331, 5.487503));
+        for (int i = 0; i < cards.size(); i++) {
             map.addMarker(new MarkerOptions()
-                    .position(geoMarkersLocations.get(i)).title("Marker Title"));
+                    .position(cards.get(i).position)).setTag(i);
         }
         map.setOnMarkerClickListener(this);
     }
@@ -263,26 +282,35 @@ public class MapsActivityCurrentPlace extends AppCompatActivity
      * Gets the current location of the device, and positions the map's camera.
      */
     // [START maps_current_place_get_device_location]
-
-
-
-
     /** Called when the user clicks a marker. */
     @Override
     public boolean onMarkerClick(final Marker marker) {
 
+        hideCardBannerIfActive();
+
+        getLayoutInflater().inflate(R.layout.card_banner, findViewById(R.id.root), true);
+        cardBanner = findViewById(R.id.card_banner);
+
+        ImageView imageView = cardBanner.findViewById(R.id.card_image);
+        TextView titleView = cardBanner.findViewById(R.id.card_title);
+        TextView descriptionView = cardBanner.findViewById(R.id.card_description);
+
+        imageView.setImageResource(cards.get((Integer)marker.getTag()).image);
+        titleView.setText(cards.get((Integer)marker.getTag()).title);
+        titleView.setText(cards.get((Integer)marker.getTag()).description);
+
         // Retrieve the data from the marker.
-        Integer clickCount = (Integer) marker.getTag();
+        //Integer clickCount = (Integer) marker.getTag();
 
         // Check if a click count was set, then display the click count.
-        if (clickCount != null) {
-            clickCount = clickCount + 1;
-            marker.setTag(clickCount);
-            Toast.makeText(this,
-                    marker.getTitle() +
-                            " has been clicked " + clickCount + " times.",
-                    Toast.LENGTH_SHORT).show();
-        }
+        //if (clickCount != null) {
+        //    clickCount = clickCount + 1;
+        //    marker.setTag(clickCount);
+        //    Toast.makeText(this,
+        //            marker.getTitle() +
+        //                    " has been clicked " + clickCount + " times.",
+        //            Toast.LENGTH_SHORT).show();
+        //}
 
         // Return false to indicate that we have not consumed the event and that we wish
         // for the default behavior to occur (which is for the camera to move such that the
@@ -524,4 +552,11 @@ public class MapsActivityCurrentPlace extends AppCompatActivity
                         .tilt(map.getCameraPosition().tilt)
                         .build()), 500, null);
     }
+
+    private void hideCardBannerIfActive() {
+        if (cardBanner != null) {
+            ((ViewGroup)findViewById(R.id.root)).removeView(cardBanner);
+        }
+    }
+
 }
